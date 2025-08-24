@@ -1,5 +1,4 @@
-
-// Registrar Service Worker
+// Service Worker
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js")
     .then(() => console.log("Service Worker registrado"))
@@ -8,7 +7,7 @@ if ("serviceWorker" in navigator) {
 
 const pacienteBuscar = document.querySelector("#paciente");
 const buscar = document.querySelector(".buscar");
-const añadir = document.querySelector(".añadir");
+const abrirModal = document.querySelector(".abrir-modal");
 const mostrarPacientes = document.querySelector(".mostrar-pacientes");
 const formulario = document.querySelector(".form-añadir");
 const cerrar = document.querySelector(".cerrar");
@@ -16,30 +15,20 @@ const añadirPaciente = document.querySelector("#añadirPaciente");
 const nombre = document.querySelector("#nombre");
 const telefono = document.querySelector("#telefono");
 
-// "Base de datos" simulada
-const listaPacientes = [
+let listaPacientes = JSON.parse(localStorage.getItem("pacientes")) || [
     { nombre: "Marifer", telefono: 3331080912, faltas: 1 },
     { nombre: "Julian", telefono: 3331080913, faltas: 3 },
     { nombre: "Julio", telefono: 3331080914, faltas: 2 },
     { nombre: "Ramiro", telefono: 3331080915, faltas: 5 }
 ];
 
-// -------- Persistencia en localStorage --------
 function guardarPacientes() {
     localStorage.setItem("pacientes", JSON.stringify(listaPacientes));
 }
 
-function cargarDesdeLocalStorage() {
-    const data = localStorage.getItem("pacientes");
-    if (data) {
-        listaPacientes.splice(0, listaPacientes.length, ...JSON.parse(data));
-    }
-}
-
-// -------- Renderizado de pacientes --------
 function cargarPacientes(pacientes) {
     mostrarPacientes.innerHTML = "";
-    pacientes.forEach((p) => {
+    pacientes.forEach(p => {
         const div = document.createElement("div");
         div.classList.add("pacientes");
         div.innerHTML = `
@@ -52,79 +41,55 @@ function cargarPacientes(pacientes) {
     });
 }
 
-// -------- Inicialización --------
-cargarDesdeLocalStorage();
+// Inicializar
 cargarPacientes(listaPacientes);
 
-// -------- Eventos --------
-
-// Aumentar faltas
-mostrarPacientes.addEventListener("click", (e) => {
-    if (e.target.classList.contains("unaFaltaMas")) {
+// Eventos
+mostrarPacientes.addEventListener("click", e => {
+    if(e.target.classList.contains("unaFaltaMas")) {
         const tel = e.target.dataset.tel;
         const paciente = listaPacientes.find(p => p.telefono == tel);
-
-        if (paciente) {
+        if(paciente){
             paciente.faltas++;
-            guardarPacientes();               // 👈 Guardar cambios
-            cargarPacientes(listaPacientes); // refrescar vista
+            guardarPacientes();
+            cargarPacientes(listaPacientes);
         }
     }
 });
 
-// Buscar pacientes
-function buscarPaciente() {
+buscar.addEventListener("click", () => {
     const tel = pacienteBuscar.value.trim();
     const encontrado = listaPacientes.find(p => p.telefono == tel);
-
-    if (encontrado) {
+    if(encontrado){
         cargarPacientes([encontrado]);
     } else {
-        mostrarPacientes.innerHTML = "";
-        const noEncontrado = document.createElement("p");
-        noEncontrado.classList.add("no-encontrado");
-        noEncontrado.textContent = "Paciente no encontrado";
-        mostrarPacientes.appendChild(noEncontrado);
+        mostrarPacientes.innerHTML = "<p class='no-encontrado'>Paciente no encontrado</p>";
     }
-}
-buscar.addEventListener("click", buscarPaciente);
-
-// Mostrar y cerrar formulario
-añadir.addEventListener("click", () => {
-    formulario.classList.add("mostrar");
-});
-cerrar.addEventListener("click", () => {
-    formulario.classList.remove("mostrar");
 });
 
-// Añadir paciente
-function añadirPacientes(e) {
+abrirModal.addEventListener("click", () => formulario.style.display = "flex");
+cerrar.addEventListener("click", () => formulario.style.display = "none");
+
+añadirPaciente.addEventListener("click", e => {
     e.preventDefault();
-
     const nuevo = {
         nombre: nombre.value.trim(),
         telefono: Number(telefono.value.trim()),
         faltas: 1
     };
-
-    if (nuevo.nombre === "" || !nuevo.telefono) {
-        alert("Por favor llenar los campos requeridos");
+    if(!nuevo.nombre || !nuevo.telefono){
+        alert("Por favor llenar todos los campos");
         return;
     }
-
     const existe = listaPacientes.find(p => p.telefono === nuevo.telefono);
-
-    if (existe) {
-        alert("Este telefono ya ha sido registrado antes");
-        cargarPacientes([existe]);
-    } else {
-        listaPacientes.push(nuevo);
-        guardarPacientes(); // 👈 Guardar nuevo paciente
-        cargarPacientes(listaPacientes);
+    if(existe){
+        alert("Este teléfono ya está registrado");
+        return;
     }
-
+    listaPacientes.push(nuevo);
+    guardarPacientes();
+    cargarPacientes(listaPacientes);
     nombre.value = "";
     telefono.value = "";
-    formulario.classList.remove("mostrar");
-}
-añadirPaciente.addEventListener("click", añadirPacientes);
+    formulario.style.display = "none";
+});
