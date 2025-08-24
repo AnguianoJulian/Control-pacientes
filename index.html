@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0078d7">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <main>
+        <section class="buscador-pacientes">
+            <input type="text" name="pacinte" id="paciente" class="paciente" placeholder="Ingresar el telefono del paciente">
+            <button class="buscar" id="buscar"><i class="bi bi-search"></i></button>
+            <button class="añadir" id="añadir">Añadir <i class="bi bi-plus-lg"></i></button>
+        </section>
+        <section class="mostrar-pacientes">
+        </section>
+        <section class="form-añadir">
+            <form action="" class="form">
+                <button class="cerrar"><i class="bi bi-x-lg"></i></button>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre">
+                <label for="telefono">Telefono:</label>
+                <input type="tel" id="telefono">
+                <button class="añadir" id="añadirPaciente">Añadir</button>
+            </form>
+        </section>
+    </main>
+    <script src="main.js"></script>
+</body>
+</html>
